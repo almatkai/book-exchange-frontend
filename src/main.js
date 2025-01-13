@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import '@mdi/font/css/materialdesignicons.css'
 import api from './api'
+import store from './store'; // Import the Vuex store
 
 // Vuetify
 import 'vuetify/styles'
@@ -24,4 +25,5 @@ const app = createApp(App)
 app.config.globalProperties.$api = api
 app.use(router)
 app.use(vuetify)
+app.use(store)
 app.mount('#app')

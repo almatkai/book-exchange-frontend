@@ -12,7 +12,9 @@
         </template>
         <template v-else>
           <router-link to="/my-books" class="nav-item">My Books</router-link>
-          <a @click="logout" class="nav-item">Logout</a>
+          <router-link to="/notifications" class="nav-item">Notifications</router-link>
+          <a class="nav-item" @click="logout">Logout</a>
+          <a class="nav-item" >{{ userData?.username || 'Username Missing' }}</a>
         </template>
       </div>
     </nav>
@@ -21,24 +23,35 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'App',
-  setup() {
-    const isAuthenticated = ref(false)
-    const router = useRouter()
+  computed: {
+    ...mapState(['isAuthenticated', "userData"]),
+  },
+  methods: {
+    ...mapActions(['logout', 'setUserData']),
 
-    const logout = () => {
-      isAuthenticated.value = false
-      localStorage.removeItem('token')
-      router.push('/login')
-    }
-
-    return {
-      isAuthenticated,
-      logout
+    async getUserData() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await this.$api.get('user-data');
+                const userData = response.data
+                if (response.status === 200) {
+                    this.setUserData(userData);
+                    this.$router.push('/books');
+                }
+            } catch (error) {
+                console.error("Error: ", error);
+            }
+        }
+    },
+  },
+  created() {
+    if (this.isAuthenticated) {
+      this.getUserData();
     }
   }
 }

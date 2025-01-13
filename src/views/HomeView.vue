@@ -52,6 +52,7 @@
       <v-col cols="12" md="8" class="text-center">
         <h2 class="text-h5 mb-6">Get Started</h2>
         <v-btn
+          v-if="!isAuthenticated"
           color="primary"
           size="large"
           class="mx-2"
@@ -63,7 +64,7 @@
         <v-btn
           color="secondary"
           size="large"
-          class="mx-2"
+          class="mx-2 pulse-button"
           to="/books"
           prepend-icon="mdi-book-search"
         >
@@ -93,6 +94,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'HomeView',
   props: {
@@ -100,6 +103,9 @@ export default {
       type: String,
       default: 'Welcome to BookSwap'
     }
+  },
+  computed: {
+    ...mapState(['isAuthenticated'])
   },
   data() {
     return {
@@ -118,5 +124,24 @@ export default {
 <style scoped>
 .v-btn {
   text-transform: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+.pulse-button {
+  animation: pulse 2s infinite;
 }
 </style>

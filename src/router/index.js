@@ -1,9 +1,9 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/HomeView.vue'
-import Login from '../views/LoginView.vue'
+import AuthView from '../views/AuthView.vue'
 // import Register from '../views/Register.vue'
-// import Books from '../views/Books.vue'
+import Books from '../views/Books.vue'
 // import MyBooks from '../views/MyBooks.vue'
 
 const routes = [
@@ -13,20 +13,20 @@ const routes = [
         component: Home
     },
     {
+        path: '/register',
+        name: 'Register',
+        component: AuthView
+    },
+    {
         path: '/login',
         name: 'Login',
-        component: Login
+        component: AuthView
     },
-    // {
-    //     path: '/register',
-    //     name: 'Register',
-    //     component: Register
-    // },
-    // {
-    //     path: '/books',
-    //     name: 'Books',
-    //     component: Books
-    // },
+    {
+        path: '/books',
+        name: 'BooksView',
+        component: Books
+    },
     // {
     //     path: '/my-books',
     //     name: 'MyBooks',
@@ -42,7 +42,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const isAuthenticated = localStorage.getItem('token')
-    
+
     if (to.meta.requiresAuth && !isAuthenticated) {
         next('/login')
     } else {
