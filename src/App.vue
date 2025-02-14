@@ -4,17 +4,44 @@
     <nav class="navbar">
       <router-link to="/" class="nav-logo">BookSwap</router-link>
       <div class="nav-links">
-        <router-link to="/" class="nav-item">Home</router-link>
-        <router-link to="/books" class="nav-item">Browse Books</router-link>
+        <router-link to="/" class="nav-item">
+          <i class="mdi mdi-home"></i> <!-- Home Icon -->
+        </router-link>
+        <router-link to="/books" class="nav-item">
+          <i class="mdi mdi-bookshelf"></i> <!-- Browse Books Icon -->
+        </router-link>
         <template v-if="!isAuthenticated">
           <router-link to="/login" class="nav-item">Login</router-link>
           <router-link to="/register" class="nav-item">Register</router-link>
         </template>
         <template v-else>
-          <router-link to="/my-books" class="nav-item">My Books</router-link>
-          <router-link to="/notifications" class="nav-item">Notifications</router-link>
-          <a class="nav-item" @click="logout">Logout</a>
-          <a class="nav-item" >{{ userData?.username || 'Username Missing' }}</a>
+          <router-link to="/notifications" class="nav-item">
+            <i class="mdi mdi-bell"></i> <!-- Notifications Icon -->
+          </router-link>
+
+          <div class="dropdown" @mouseenter="startHover" @mouseleave="endHover">
+            <a class="nav-item dropdown-toggle">
+              <span v-if="userData && userData.username">{{ userData.username }}</span>
+              <span v-else>User</span>
+              <i class="mdi mdi-account-circle"></i> <!-- User Icon -->
+            </a>
+            <div v-if="isHovered && userData" class="dropdown-content">
+              <router-link to="/profile" class="dropdown-item">
+                <i class="mdi mdi-account"></i> Profile <!-- Profile Icon -->
+              </router-link>
+              <router-link to="/settings" class="dropdown-item">
+                <i class="mdi mdi-cog"></i> Settings <!-- Settings Icon -->
+              </router-link>
+              <a class="dropdown-item" @click="logout">
+                <i class="mdi mdi-logout"></i> Logout <!-- Logout Icon -->
+              </a>
+            </div>
+          </div>
+
+          <router-link to="/new-request" class="new-request-btn">
+            Swap Book
+          </router-link>
+
         </template>
       </div>
     </nav>
@@ -27,34 +54,64 @@ import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'App',
+  data() {
+    return {
+      isHovered: false,
+      hoverTimeout: null,
+    };
+  },
   computed: {
-    ...mapState(['isAuthenticated', "userData"]),
+    ...mapState('auth', ['isAuthenticated', 'userData']),
   },
   methods: {
     ...mapActions(['logout', 'setUserData']),
 
+    startHover() {
+      this.hoverTimeout = setTimeout(() => {
+        this.isHovered = true;
+      }, 300); // 0.3 seconds delay
+    },
+
+    endHover() {
+      clearTimeout(this.hoverTimeout);
+      this.isHovered = false;
+    },
+
     async getUserData() {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const response = await this.$api.get('user-data');
-                const userData = response.data
-                if (response.status === 200) {
-                    this.setUserData(userData);
-                    this.$router.push('/books');
-                }
-            } catch (error) {
-                console.error("Error: ", error);
-            }
+      const token = localStorage.getItem('token');
+      console.log('Fetching user data with token ', token);
+      if (token) {
+        try {
+
+          const response = await this.$api.get('user-data');
+          const userData = response.data;
+          if (response.status === 200) {
+            this.setUserData(userData);
+            this.$router.push('/books');
+          }
+        } catch (error) {
+          console.error('Error: ', error);
         }
+      }
     },
   },
   created() {
+    console.log('App created');
+    console.log(localStorage.getItem("token"));
+    console.log(this.isAuthenticated);
     if (this.isAuthenticated) {
       this.getUserData();
     }
+  },
+  watch: {
+    isAuthenticated(newVal) {
+      console.log('isAuthenticated changed: ', newVal);
+      if (newVal) {
+        this.getUserData();
+      }
+    }
   }
-}
+};
 </script>
 
 <style>
@@ -69,9 +126,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.8rem 2rem;
   background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .nav-logo {
@@ -89,11 +146,44 @@ export default {
 .nav-item {
   color: #2c3e50;
   text-decoration: none;
-  font-weight: 500;
   cursor: pointer;
+  font-size: 1.2rem;
 }
 
 .nav-item:hover {
   color: #42b983;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: block;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  left: 0;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  opacity: 1;
+  visibility: visible;
 }
 </style>

@@ -4,6 +4,7 @@ import Home from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
 // import Register from '../views/Register.vue'
 import Books from '../views/Books.vue'
+import NewRequest from '../views/NewRequest.vue'
 // import MyBooks from '../views/MyBooks.vue'
 
 const routes = [
@@ -25,6 +26,17 @@ const routes = [
     {
         path: '/books',
         name: 'BooksView',
+        component: Books
+    },
+    {
+        path: '/new-request',
+        name: 'NewRequest',
+        component: NewRequest,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/notifications',
+        name: 'NotificationsView',
         component: Books
     },
     // {
