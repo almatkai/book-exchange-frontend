@@ -6,30 +6,15 @@
             <form @submit.prevent="handleSubmit">
                 <div class="form-group">
                     <label>Email</label>
-                    <input 
-                        type="email" 
-                        v-model="email" 
-                        required 
-                        placeholder="Enter your email"
-                    >
+                    <input type="email" v-model="email" required placeholder="Enter your email">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input 
-                        type="password" 
-                        v-model="password" 
-                        required 
-                        placeholder="Enter your password"
-                    >
+                    <input type="password" v-model="password" required placeholder="Enter your password">
                 </div>
                 <div class="form-group" v-if="!isLogin">
                     <label>Confirm Password</label>
-                    <input 
-                        type="password" 
-                        v-model="confirmPassword" 
-                        required 
-                        placeholder="Confirm your password"
-                    >
+                    <input type="password" v-model="confirmPassword" required placeholder="Confirm your password">
                 </div>
                 <button type="submit" class="submit-btn">
                     {{ isLogin ? 'Login' : 'Register' }}
@@ -62,9 +47,6 @@ export default {
 
     created() {
         this.isLogin = this.$route.path === '/login';
-
-        console.log("SAS: ", this.$route.path);
-        
     },
 
     watch: {
@@ -85,11 +67,12 @@ export default {
                 email: this.email,
                 password: this.password
             };
-            
+
             try {
                 const response = await this.$api.post(endpoint, payload);
-                console.log("response: ", response)
+
                 if (response.data.token) {
+                    console.log("Handle submit with response: ", response)
                     this.login(response.data);
                     this.$router.push('/books');
                 }
@@ -116,7 +99,7 @@ export default {
     background: white;
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
 }

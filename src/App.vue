@@ -64,7 +64,7 @@ export default {
     ...mapState('auth', ['isAuthenticated', 'userData']),
   },
   methods: {
-    ...mapActions(['logout', 'setUserData']),
+    ...mapActions('auth', ['logout', 'setUserData']),
 
     startHover() {
       this.hoverTimeout = setTimeout(() => {
@@ -79,11 +79,11 @@ export default {
 
     async getUserData() {
       const token = localStorage.getItem('token');
-      console.log('Fetching user data with token ', token);
       if (token) {
         try {
-
-          const response = await this.$api.get('user-data');
+          console.log('Fetching user data...');
+          const response = await this.$api.get('/v2user-data');
+          console.log('User data response: ', response);
           const userData = response.data;
           if (response.status === 200) {
             this.setUserData(userData);
@@ -97,20 +97,12 @@ export default {
   },
   created() {
     console.log('App created');
-    console.log(localStorage.getItem("token"));
-    console.log(this.isAuthenticated);
+    console.log('this.isAuthenticated: ', this.isAuthenticated);
     if (this.isAuthenticated) {
       this.getUserData();
+      console.log('User is authenticated, with userData: ', this.userData);
     }
   },
-  watch: {
-    isAuthenticated(newVal) {
-      console.log('isAuthenticated changed: ', newVal);
-      if (newVal) {
-        this.getUserData();
-      }
-    }
-  }
 };
 </script>
 
